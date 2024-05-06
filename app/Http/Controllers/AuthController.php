@@ -34,20 +34,21 @@ class AuthController extends Controller
         }
     }
 
-    // public function login(Request $request)
-    // {
-    //     $credentials = $request->validate([
-    //         'email' => 'required|email',
-    //         'password' => 'required',
-    //     ]);
+    public function login(Request $request)
+    {
+        try {
+            // Proses validasi login, Anda mungkin sudah punya ini
+            $credentials = $request->only('email', 'password');
+            if (Auth::attempt($credentials)) {
+                // Jika login berhasil, arahkan ke LawyerProfilePage
+                return response()->json(['redirect' => 'Lawyer-Page'], 200);
+            }
 
-    //     if (Auth::attempt($credentials)) {
-    //         $user = Auth::user();
-    //         $token = $user->createToken('AuthToken')->plainTextToken;
-
-    //         return response()->json(['token' => $token], 200);
-    //     }
-
-    //     return response()->json(['error' => 'Unauthorized'], 401);
-    // }
+            // Jika login gagal, kirim pesan error
+            return response()->json(['error' => 'Unauthorized'], 401);
+        } catch (\Exception $e) {
+            // Tangkap dan kirim pesan error
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 }

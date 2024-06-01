@@ -36,19 +36,32 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        try {
-            // Proses validasi login, Anda mungkin sudah punya ini
-            $credentials = $request->only('email', 'password');
-            if (Auth::attempt($credentials)) {
-                // Jika login berhasil, arahkan ke LawyerProfilePage
-                return response()->json(['redirect' => 'Lawyer-Page'], 200);
-            }
+        $request->validate([
+            'email' => 'required|string|email',
+            'password' => 'required|string',
+        ]);
 
-            // Jika login gagal, kirim pesan error
-            return response()->json(['error' => 'Unauthorized'], 401);
-        } catch (\Exception $e) {
-            // Tangkap dan kirim pesan error
-            return response()->json(['error' => $e->getMessage()], 500);
+        $credentials = request(['email', 'password']);
+
+        if (!Auth::attempt($credentials)) {
+            return response()->json(['message' => 'Unauthorized'], 401);
         }
+
+        $user = $request->user();
+        $token = $user->createToken('token-name')->plainTextToken;
+
+        return response()->json(['token' => $token, 'user' => $user]);
+    }
+
+    public function me(Request $request)
+    {
+        return response()->json($request->user());
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json(['message' => 'Logged out']);
     }
 }

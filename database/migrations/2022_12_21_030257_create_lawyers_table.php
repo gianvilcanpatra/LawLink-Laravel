@@ -13,12 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        //create a database table for lawyer
-        //and this lawyer table is refer to User table
-        //when a new lawyer registered, the lawyer details will be created as well
         Schema::create('lawyers', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('law_id')->unique();
+            $table->unsignedBigInteger('law_id')->unique();
             $table->string('category')->nullable();
             $table->unsignedInteger('patients')->nullable();
             $table->unsignedInteger('experience')->nullable();

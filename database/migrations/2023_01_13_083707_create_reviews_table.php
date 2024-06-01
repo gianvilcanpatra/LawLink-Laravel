@@ -13,11 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        //a new database for rating and reviews
+        // A new database for rating and reviews
         Schema::create('reviews', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('user_id');
-            $table->unsignedInteger('law_id');
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('law_id');
             $table->unsignedInteger('ratings')->nullable();
             $table->longText('reviews')->nullable();
             $table->string('reviewed_by');

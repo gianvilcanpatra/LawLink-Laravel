@@ -13,11 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        //add new table for appointments
+        // Add new table for appointments
         Schema::create('appointments', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('user_id');
-            $table->unsignedInteger('law_id');
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('law_id');
             $table->string('date');
             $table->string('day');
             $table->string('time');

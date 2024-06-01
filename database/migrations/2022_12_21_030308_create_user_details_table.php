@@ -13,11 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        //this table is same as lawyer table
-        //but is for users to store their details
+        // This table is for users to store their details
         Schema::create('user_details', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('user_id')->unique();
+            $table->unsignedBigInteger('user_id')->unique();
             $table->longText('bio_data')->nullable();
             $table->string('status')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

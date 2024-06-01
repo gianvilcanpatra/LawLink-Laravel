@@ -9,13 +9,19 @@ class Lawyer extends Model
 {
     use HasFactory;
 
+    //these are fillable input
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'pendidikan',
-        'semester',
-        'statuskelulusan',
-        'deskripsi',
+        'law_id',
+        'category',
+        'patients',
+        'experience',
+        'bio_data',
+        'status',
     ];
+
+    //state this is belong to user table
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

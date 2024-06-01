@@ -1,10 +1,10 @@
 <?php
 
+use App\Http\Controllers\AppointmentsController;
+use App\Http\Controllers\LawsController;
+use App\Http\Controllers\UsersController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\LawyerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -12,21 +12,22 @@ use App\Http\Controllers\LawyerController;
 |--------------------------------------------------------------------------
 |
 | Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
+| routes are loaded by the RouteServiceProvider within a group which
+| is assigned the "api" middleware group. Enjoy building your API!
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+//this is the endpoint with prefix /api
+Route::post('/login', [UsersController::class, 'login']);
+Route::post('/register', [UsersController::class, 'register']);
 
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
-Route::get('/login', [AuthController::class, 'login']);
-// Route::middleware('auth:api')->get('/lawyers', [UserController::class, 'index']);
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+//modify this
+//this group mean return user's data if authenticated successfully
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user', [UsersController::class, 'index']);
+    Route::post('/fav', [UsersController::class, 'storeFavDoc']);
+    Route::post('/logout', [UsersController::class, 'logout']);
+    Route::post('/book', [AppointmentsController::class, 'store']);
+    Route::post('/reviews', [LawsController::class, 'store']);
+    Route::get('/appointments', [AppointmentsController::class, 'index']);
 });
-Route::get('/lawyers', [UserController::class, 'index']);
-Route::get('/user', [UserController::class, 'index']);

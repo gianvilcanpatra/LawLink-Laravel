@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Reviews;
 
 class UsersController extends Controller
 {
@@ -29,7 +30,10 @@ class UsersController extends Controller
         $date = now()->format('n/j/Y'); //change date format to suit the format in database
 
         //make this appointment filter only status is "upcoming"
-        $appointment = Appointments::where('status', 'upcoming')->where('date', $date)->first();
+        $appointment = Appointments::where('user_id', $user->id)
+            ->where('status', 'upcoming')
+            ->where('date', $date)
+            ->first();
 
         //collect user data and all lawyer details
         foreach ($lawyerData as $data) {
@@ -41,6 +45,10 @@ class UsersController extends Controller
                     if (isset($appointment) && $appointment['law_id'] == $info['id']) {
                         $data['appointments'] = $appointment;
                     }
+
+                    // $ratings = Reviews::where('law_id', $lawyer->id)->pluck('ratings');
+                    // $averageRating = $ratings->average();
+                    // $lawyer->rating = $averageRating;
                 }
             }
         }

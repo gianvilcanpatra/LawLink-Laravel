@@ -23,6 +23,9 @@ use App\Http\Controllers\UserController;
 
 //this is the endpoint with prefix /api
 
+Route::post('/login', [UsersController::class, 'login']);
+Route::post('/register', [UsersController::class, 'register']);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [UsersController::class, 'index']);
     Route::post('/fav', [UsersController::class, 'storeFavDoc']);

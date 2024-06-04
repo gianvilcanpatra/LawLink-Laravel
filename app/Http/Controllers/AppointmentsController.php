@@ -54,7 +54,19 @@ class AppointmentsController extends Controller
      */
     public function store(Request $request)
     {
-        //this controller is to store booking details post from mobile app
+        // Cek apakah slot waktu yang diminta sudah dipesan
+        $existingAppointment = Appointments::where('law_id', $request->get('lawyer_id'))
+            ->where('date', $request->get('date'))
+            ->where('time', $request->get('time'))
+            ->first();
+
+        if ($existingAppointment) {
+            return response()->json([
+                'error' => 'Slot already booked!'
+            ], 400);
+        }
+
+        // Jika slot waktu tersedia, simpan janji baru
         $appointment = new Appointments();
         $appointment->user_id = Auth::user()->id;
         $appointment->law_id = $request->get('lawyer_id');
@@ -64,9 +76,27 @@ class AppointmentsController extends Controller
         $appointment->status = 'upcoming'; //new appointment will be saved as 'upcoming' by default
         $appointment->save();
 
-        //if successfully, return status code 200
+        // Jika berhasil, kembalikan status kode 200
         return response()->json([
             'success' => 'New Appointment has been made successfully!',
+        ], 200);
+    }
+
+    public function checkSlot(Request $request)
+    {
+        $existingAppointment = Appointments::where('law_id', $request->get('lawyer_id'))
+            ->where('date', $request->get('date'))
+            ->where('time', $request->get('time'))
+            ->first();
+
+        if ($existingAppointment) {
+            return response()->json([
+                'error' => 'Slot already booked!'
+            ], 400);
+        }
+
+        return response()->json([
+            'success' => 'Slot available!'
         ], 200);
     }
 

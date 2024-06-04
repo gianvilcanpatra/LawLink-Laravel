@@ -45,10 +45,6 @@ class UsersController extends Controller
                     if (isset($appointment) && $appointment['law_id'] == $info['id']) {
                         $data['appointments'] = $appointment;
                     }
-
-                    // $ratings = Reviews::where('law_id', $lawyer->id)->pluck('ratings');
-                    // $averageRating = $ratings->average();
-                    // $lawyer->rating = $averageRating;
                 }
             }
         }

@@ -32,5 +32,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [UsersController::class, 'logout']);
     Route::post('/book', [AppointmentsController::class, 'store']);
     Route::post('/reviews', [LawsController::class, 'store']);
+    Route::post('/check-slot', [AppointmentsController::class, 'checkSlot']);
     Route::get('/appointments', [AppointmentsController::class, 'index']);
 });

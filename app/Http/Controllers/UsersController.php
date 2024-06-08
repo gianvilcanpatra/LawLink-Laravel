@@ -21,39 +21,55 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $user = array(); //this will return a set of user and lawyer data
+        $user = array();
         $user = Auth::user();
         $lawyer = User::where('type', 'lawyer')->get();
         $details = $user->user_details;
         $lawyerData = Lawyer::all();
-        //this is the date format without leading
-        $date = now()->format('n/j/Y'); //change date format to suit the format in database
+        $date = now()->format('n/j/Y');
 
-        //make this appointment filter only status is "upcoming"
         $appointment = Appointments::where('user_id', $user->id)
             ->where('status', 'upcoming')
             ->where('date', $date)
             ->first();
 
-        //collect user data and all lawyer details
         foreach ($lawyerData as $data) {
-            //sorting lawyer name and lawyer details
             foreach ($lawyer as $info) {
                 if ($data['law_id'] == $info['id']) {
                     $data['lawyer_name'] = $info['name'];
                     $data['lawyer_profile'] = $info['profile_photo_url'];
+
                     if (isset($appointment) && $appointment['law_id'] == $info['id']) {
                         $data['appointments'] = $appointment;
                     }
+
+                    // Ambil rating dan ulasan dari tabel reviews
+                    $reviews = Reviews::where('law_id', $data['law_id'])->where('status', 'active')->get();
+                    $data['reviews'] = $reviews;
+                    $data['average_rating'] = $reviews->avg('ratings'); // Rata-rata rating
                 }
             }
         }
 
         $user['lawyer'] = $lawyerData;
-        $user['details'] = $details; //return user details here together with lawyer list
+        $user['details'] = $details;
 
-        return $user; //return all data
+        return $user;
     }
+
+    public function getReviews($lawId)
+    {
+        $reviews = Reviews::where('law_id', $lawId)->get();
+
+        if ($reviews->isEmpty()) {
+            return response()->json(['message' => 'No reviews found'], 404);
+        }
+
+        return response()->json($reviews, 200);
+    }
+
+
+
 
     /**
      * loign.

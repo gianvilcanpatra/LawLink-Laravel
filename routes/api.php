@@ -31,7 +31,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/fav', [UsersController::class, 'storeFavDoc']);
     Route::post('/logout', [UsersController::class, 'logout']);
     Route::post('/book', [AppointmentsController::class, 'store']);
+    Route::post('/appointments/cancel/{id}', [AppointmentsController::class, 'cancel']);
     Route::post('/reviews', [LawsController::class, 'store']);
     Route::post('/check-slot', [AppointmentsController::class, 'checkSlot']);
     Route::get('/appointments', [AppointmentsController::class, 'index']);
+    Route::post('/reschedule', [AppointmentsController::class, 'reschedule']);
+    Route::get('reviews/{lawId}', [UsersController::class, 'getReviews']);
 });

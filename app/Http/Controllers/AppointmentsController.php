@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Appointments;
 use Illuminate\Http\Request;
-use App\Models\User;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class AppointmentsController extends Controller
@@ -35,6 +36,58 @@ class AppointmentsController extends Controller
 
         return $appointment;
     }
+
+    public function cancel(Request $request, $id)
+    {
+        // Temukan janji temu berdasarkan ID
+        $appointment = Appointments::find($id);
+
+        // Periksa apakah janji temu ditemukan dan milik user yang sedang login
+        if (!$appointment || $appointment->user_id != Auth::user()->id) {
+            return response()->json(['error' => 'Appointment not found or unauthorized'], 404);
+        }
+
+        // Ubah status janji temu menjadi "canceled"
+        $appointment->status = 'cancel';
+        $appointment->save();
+
+        return response()->json(['success' => 'Appointment has been canceled'], 200);
+    }
+
+    public function reschedule(Request $request)
+    {
+        // Validate input
+        $request->validate([
+            'appointment_id' => 'required|integer',
+            'date' => 'required|date',
+            'time' => 'required|string',
+        ]);
+
+        // Find the appointment
+        $appointment = Appointments::find($request->get('appointment_id'));
+
+        if (!$appointment) {
+            return response()->json(['error' => 'Appointment not found!'], 404);
+        }
+
+        // Check if the new slot is available
+        $existingAppointment = Appointments::where('law_id', $appointment->law_id)
+            ->where('date', $request->get('date'))
+            ->where('time', $request->get('time'))
+            ->first();
+
+        if ($existingAppointment) {
+            return response()->json(['error' => 'Slot already booked!'], 400);
+        }
+
+        // Update the appointment with new date and time
+        $appointment->date = $request->get('date');
+        $appointment->time = $request->get('time');
+        $appointment->save();
+
+        return response()->json(['success' => 'Appointment rescheduled successfully!'], 200);
+    }
+
 
     /**
      * Show the form for creating a new resource.

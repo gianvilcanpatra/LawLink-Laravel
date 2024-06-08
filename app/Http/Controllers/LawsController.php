@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Lawyer;
 use App\Models\Reviews;
 use App\Models\Appointments;
 use Illuminate\Http\Request;
@@ -24,6 +25,25 @@ class LawsController extends Controller
 
         //return all data to dashboard
         return view('dashboard')->with(['lawyer' => $lawyer, 'appointments' => $appointments, 'reviews' => $reviews]);
+    }
+
+    public function getLawyerDetails($law_id)
+    {
+        $lawyer = Lawyer::where('law_id', $law_id)->first();
+
+        if (!$lawyer) {
+            return response()->json(['error' => 'Lawyer not found'], 404);
+        }
+
+        // Get average rating
+        $averageRating = Reviews::where('law_id', $law_id)->avg('ratings');
+        $reviews = Reviews::where('law_id', $law_id)->where('status', 'active')->get();
+
+        return response()->json([
+            'lawyer' => $lawyer,
+            'averageRating' => $averageRating,
+            'reviews' => $reviews,
+        ]);
     }
 
     /**

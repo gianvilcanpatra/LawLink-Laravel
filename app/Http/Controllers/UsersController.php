@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Reviews;
 use Illuminate\Support\Facades\Validator;
 
@@ -155,14 +156,10 @@ class UsersController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function logout()
+    public function logout(Request $request)
     {
-        $user = Auth::user();
-        $user->currentAccessToken()->delete();
-
-        return response()->json([
-            'success' => 'Logout successfully!',
-        ], 200);
+        $request->user()->token()->revoke();
+        return response()->json(['message' => 'Successfully logged out']);
     }
 
     /**
@@ -217,6 +214,7 @@ class UsersController extends Controller
      */
     public function update(Request $request)
     {
+        /** @var \App\Models\User $user **/
         $user = Auth::user();
 
         $validator = Validator::make($request->all(), [
@@ -243,6 +241,7 @@ class UsersController extends Controller
     //UPLOAD PHOTO
     public function uploadPhoto(Request $request)
     {
+        /** @var \App\Models\User $user **/
         $user = Auth::user();
 
         $validator = Validator::make($request->all(), [

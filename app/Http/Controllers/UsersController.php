@@ -11,6 +11,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Reviews;
+use Illuminate\Support\Facades\Validator;
 
 class UsersController extends Controller
 {
@@ -214,9 +215,55 @@ class UsersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        $user = Auth::user();
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'sometimes|required|string|max:255',
+            'email' => 'sometimes|required|string|email|max:255|unique:users,email,' . $user->id,
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        if ($request->has('name')) {
+            $user->name = $request->name;
+        }
+
+        if ($request->has('email')) {
+            $user->email = $request->email;
+        }
+
+        $user->save();
+
+        return response()->json(['message' => 'Profile updated successfully'], 200);
+    }
+    //UPLOAD PHOTO
+    public function uploadPhoto(Request $request)
+    {
+        $user = Auth::user();
+
+        $validator = Validator::make($request->all(), [
+            'profile_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Delete old profile photo if exists
+        if ($user->profile_photo_path) {
+            Storage::delete($user->profile_photo_path);
+        }
+
+        // Store new profile photo
+        $path = $request->file('profile_photo')->store('profile_photos');
+        $user->profile_photo_path = $path;
+        $user->save();
+
+        return response()->json(['message' => 'Profile photo updated successfully'], 200);
     }
 
     /**

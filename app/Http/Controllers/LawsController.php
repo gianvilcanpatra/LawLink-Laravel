@@ -22,9 +22,12 @@ class LawsController extends Controller
         $lawyer = Auth::user();
         $appointments = Appointments::where('law_id', $lawyer->id)->where('status', 'upcoming')->get();
         $reviews = Reviews::where('law_id', $lawyer->id)->where('status', 'active')->get();
+        $totalHistoryAppointments = Appointments::where('law_id', $lawyer->id)
+            ->whereIn('status', ['cancel', 'complete'])
+            ->count();
 
         //return all data to dashboard
-        return view('dashboard')->with(['lawyer' => $lawyer, 'appointments' => $appointments, 'reviews' => $reviews]);
+        return view('dashboard')->with(['lawyer' => $lawyer, 'appointments' => $appointments, 'reviews' => $reviews, 'totalHistoryAppointments' => $totalHistoryAppointments]);
     }
 
     public function getLawyerDetails($law_id)

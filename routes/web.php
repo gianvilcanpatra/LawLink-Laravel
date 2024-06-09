@@ -1,8 +1,9 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LawsController;
 use App\Http\Controllers\UsersController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AppointmentsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,4 +26,7 @@ Route::middleware([
     'verified'
 ])->group(function () {
     Route::get('/dashboard', [LawsController::class, 'index'])->name('dashboard');
+    Route::get('/upcoming-appointments', [AppointmentsController::class, 'upcoming'])->name('upcoming.appointments');
+    Route::patch('/appointments/{appointment}/update-status', [AppointmentsController::class, 'updateStatus'])->name('appointments.updateStatus');
+    Route::get('/history', [AppointmentsController::class, 'history'])->name('history');
 });

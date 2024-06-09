@@ -88,6 +88,38 @@ class AppointmentsController extends Controller
         return response()->json(['success' => 'Appointment rescheduled successfully!'], 200);
     }
 
+    public function upcoming()
+    {
+        $user = Auth::user();
+        $appointments = Appointments::where('law_id', $user->id)->where('status', 'upcoming')->get();
+
+        return view('upcoming-appointments', compact('appointments'));
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $appointment = Appointments::find($id);
+
+        if (!$appointment) {
+            return redirect()->back()->with('error', 'Appointment not found');
+        }
+
+        $appointment->status = $request->input('status');
+        $appointment->save();
+
+        return redirect()->back()->with('success', 'Appointment status updated successfully');
+    }
+
+    public function history()
+    {
+        $lawyer = Auth::user();
+        $appointments = Appointments::where('law_id', $lawyer->id)
+            ->whereIn('status', ['cancel', 'complete'])
+            ->get();
+
+        return view('history', compact('appointments'));
+    }
+
 
     /**
      * Show the form for creating a new resource.

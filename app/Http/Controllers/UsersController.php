@@ -21,9 +21,8 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $user = array();
         $user = Auth::user();
-        $lawyer = User::where('type', 'lawyer')->get();
+        $lawyers = User::where('type', 'lawyer')->get();
         $details = $user->user_details;
         $lawyerData = Lawyer::all();
         $date = now()->format('n/j/Y');
@@ -34,7 +33,7 @@ class UsersController extends Controller
             ->first();
 
         foreach ($lawyerData as $data) {
-            foreach ($lawyer as $info) {
+            foreach ($lawyers as $info) {
                 if ($data['law_id'] == $info['id']) {
                     $data['lawyer_name'] = $info['name'];
                     $data['lawyer_profile'] = $info['profile_photo_url'];
@@ -43,10 +42,11 @@ class UsersController extends Controller
                         $data['appointments'] = $appointment;
                     }
 
-                    // Ambil rating dan ulasan dari tabel reviews
+                    // Fetch active reviews for the lawyer
                     $reviews = Reviews::where('law_id', $data['law_id'])->where('status', 'active')->get();
                     $data['reviews'] = $reviews;
-                    $data['average_rating'] = $reviews->avg('ratings'); // Rata-rata rating
+                    $data['average_rating'] = $reviews->avg('ratings'); // Average rating
+                    $data['total_reviews'] = $reviews->count(); // Total reviews
                 }
             }
         }
@@ -54,7 +54,7 @@ class UsersController extends Controller
         $user['lawyer'] = $lawyerData;
         $user['details'] = $details;
 
-        return $user;
+        return response()->json($user);
     }
 
     public function getReviews($lawId)

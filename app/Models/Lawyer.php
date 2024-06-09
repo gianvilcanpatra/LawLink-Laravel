@@ -16,6 +16,7 @@ class Lawyer extends Model
         'patients',
         'experience',
         'bio_data',
+        'pendidikan',
         'status',
     ];
 
